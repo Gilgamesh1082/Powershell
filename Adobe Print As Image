@@ -1,0 +1,47 @@
+$AdobeReaderPath='HKCU:\Software\Adobe\Acrobat Reader'
+$AdobeAcrobatPath='HKCU:\Software\Adobe\Adobe Acrobat'
+$AdobeReaderVersions=Get-ChildItem $AdobeReaderPath -Name
+$AdobeAcrobatVersions=Get-ChildItem $AdobeAcrobatPath -Name
+$Printers=Get-WmiObject -Class Win32_Printer
+$PrinterNumber=0
+$ExcludedPrinter1="Send To OneNote 2013"
+$ExcludedPrinter2="Microsoft XPS Document Writer"
+$ExcludedPrinter3="Fax"
+
+ForEach ($AdobeReaderVersion in $AdobeReaderVersions){
+	$AdobePath=$AdobeReaderPath + '\' + $AdobeReaderVersion
+	$GeneralPath=$AdobeReaderPath + '\' + $AdobeReaderVersion + '\General'
+	$PrintAsImagePath=$AdobeReaderPath + '\' + $AdobeReaderVersion + '\General\cPrintAsImage'
+	if(Test-Path $PrintAsImagePath){
+		Remove-Item -Path $GeneralPath -Recurse
+	}
+	New-Item -Path $AdobePath -Name "General"
+	New-Item -Path $GeneralPath -Name "cPrintAsImage"
+	ForEach ($Printer in $Printers){
+		if((($Printer -ne $ExcludedPrinter1) -or ($Printer -ne $ExcludedPrinter2) -or ($Printer -ne $ExcludedPrinter3))){
+			$PrinterKey="t" + $PrinterNumber
+			$Name=$Printer.name
+			New-ItemProperty -Path $PrintAsImagePath -Name $PrinterKey -PropertyType "String" -Value $Name
+			$PrinterNumber++
+			}
+		}
+	}	
+$PrinterNumber=0
+ForEach ($AdobeAcrobatVersion in $AdobeAcrobatVersions){
+	$AdobePath=$AdobeAcrobatPath + '\' + $AdobeAcrobatVersion
+	$GeneralPath=$AdobeAcrobatPath + '\' + $AdobeAcrobatVersion + '\General'
+	$PrintAsImagePath=$AdobeAcrobatPath + '\' + $AdobeAcrobatVersion + '\General\cPrintAsImage'
+	if(Test-Path $PrintAsImagePath){
+		Remove-Item -Path $GeneralPath -Recurse
+	}
+	New-Item -Path $AdobePath -Name "General"
+	New-Item -Path $GeneralPath -Name "cPrintAsImage"
+	ForEach ($Printer in $Printers){
+		if((($Printer -ne $ExcludedPrinter1) -or ($Printer -ne $ExcludedPrinter2) -or ($Printer -ne $ExcludedPrinter3))){
+			$PrinterKey="t" + $PrinterNumber
+			$Name=$Printer.name
+			New-ItemProperty -Path $PrintAsImagePath -Name $PrinterKey -PropertyType "String" -Value $Name
+			$PrinterNumber++
+			}
+		}
+	}
