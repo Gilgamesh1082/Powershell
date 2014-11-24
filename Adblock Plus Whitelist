@@ -1,0 +1,19 @@
+$ServerPath="\\location\of\adblockplus\whitelist\file"
+$User = Get-Content env:UserName
+$Win7 = "C:\users\" + $User + "\appdata\local\google\chrome\user data\default\file system"
+$WinXP = "C:\documents and settings\" + $User + "\local settings\application data\google\chrome\user data\default\file system"
+if (Test-Path "C:\users"){
+	$PathLocation=Get-ChildItem -Path $Win7 -Recurse | Select-String -pattern "Subscription" -List | select -Unique path
+}
+else{
+	$PathLocation=Get-ChildItem -Path $WinXP -Recurse | Select-String -pattern "Subscription" -List | select -Unique path
+}
+$FileLocation=$PathLocation.Path
+$sitename=Get-ChildItem -Path $FileLocation | Select-String -Pattern "sitename" -List | Out-String
+
+if(!$sitename){
+	$FileLocation=$FileLocation.Substring(0,$FileLocation.Length-8)
+	Copy-Item -Path $ServerPath -Destination $FileLocation -Force
+}
+
+exit
